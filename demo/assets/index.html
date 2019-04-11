@@ -1,0 +1,39 @@
+<html>
+<head> 
+  <title>ADEMO</title> 
+  <style>
+  img{
+    width:100px;
+    height:100px;
+    border-radius:50px;
+    position:absolute;
+    left:0px;
+    top:0px;
+  }
+  </style>
+</head>
+<body>
+<h1>html</h1>
+<ul>
+  <li>apple</li>
+  <li>orange</li>
+  <li>pear</li>
+</ul>
+<img src="demo/assets/sky.png">
+  <script>
+  document.body.onload=function(){
+   var startLeft=0;
+   var startTop=0;
+   setInterval(function(){
+     console.log("trigger");
+     var tu=document.querySelector("img");
+     startLeft += 5;
+     startTop +=5;
+     tu.style.left= startLeft+"px";
+     tu.style.top= startTop+"px";
+   },100);
+  }
+  </script>
+
+</body>
+</html>

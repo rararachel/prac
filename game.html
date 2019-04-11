@@ -1,0 +1,45 @@
+<html>
+<head>
+  <title> game </title>
+</head>
+<body>
+  <h1>game one</h1>
+  <script src="phaser.min.js"></script>
+  <script> 
+  var game=new Phaser.Game(800,600,Phaser.AUTO,"",{
+                   preload:preload,create:create,update:update});
+  var player;
+  var platform1;
+  var star1;
+  function preload(){
+    game.load.image("sky","/demo/assets/sky.png");
+    game.load.image("platform","/demo/assets/platform.png");
+    game.load.image("star","/demo/assets/star.png");
+    game.load.spritesheet("dude","/demo/assets/dude.png",32,48);
+  } 
+  function create(){
+    game.physics.startSystem(Phaser.Physics.ARCADE);
+    star1=game.add.sprite(10,10,"star");
+    game.physics.arcade.enable(star1);
+    star1.body.gravity.y=100;
+    //platforms=game.add.group();
+    //platforms.create();
+    platform1=game.add.sprite(0,200,"platform");
+    game.physics.arcade.enable(platform1);
+    platform1.body.immovable=true;
+    player=game.add.sprite(0,20,"dude");
+    game.physics.arcade.enable(player);
+    player.animations.add("left",[0,1,2,3],10,true);
+    player.animations.add("right",[5,6,7,8],5,true);
+    player.body.gravity.y=300;
+    player.body.velocity.x=50;
+    player.body.bounce.y=0.5;
+  }
+  function update(){
+    player.animations.play("right");
+    //player.x+=1;
+    game.physics.arcade.collide(player,platform1);
+  }
+  </script>
+</body>
+<html>

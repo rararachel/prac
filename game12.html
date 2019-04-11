@@ -1,0 +1,47 @@
+<html>
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+    </head>
+    <body>
+        <script src="phaser.min.js">
+        </script>
+        <script>
+            var game=new Phaser.Game(480,600)
+            var level0={
+              preload:function(){
+                  this.game.load.image("kid","demo/assets/animeG.png")
+              },
+              create:function(){
+                  //this.game.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL
+                  this.game.stage.backgroundColor="#5f67a0"
+                  this.girl=this.game.add.sprite(1,500,"kid")
+                  this.girl.scale.set(0.5)
+                  this.game.physics.arcade.enable(this.girl)
+                  this.girl.body.gravity.y=200
+                  this.girl.body.collideWorldBounds=true
+                  this.girl.body.velocity.x=150
+                  this.girl.body.onWorldBounds=new Phaser.Signal()
+                  this.girl.body.onWorldBounds.add(this.hitBounds,this)
+                  this.game.input.onTap.add(this.jump,this)
+              },
+              hitBounds:function(sprite,up,down,left,right){
+                //console.log(up,down,left,right,this.girl.body.velocity.x)
+                if(left){
+                    this.girl.body.velocity.x=150
+                }
+                if(right){
+                    this.girl.body.velocity.x=-150
+                }
+              },
+              jump:function(){
+                  if(this.girl.body.onFloor()){
+                    this.girl.body.velocity.y=-200
+                  }
+              }
+                  
+            }
+            game.state.add("L0",level0)
+            game.state.start("L0")
+        </script>
+    </body>
+</html>

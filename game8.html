@@ -1,0 +1,98 @@
+ <html>
+<head>
+</head>
+<body>
+<script src="phaser.min.js"></script>
+<script>
+var level={preload:preload,create:create,update:update}
+var game=new Phaser.Game(800,600,Phaser.AUTO,"",level)
+
+function preload(){
+  game.load.image("bird","demo/assets/tao.png")
+  game.load.image("blk","demo/assets/xiangzi.png")
+  game.load.image("universe","demo/assets/uni.png")
+  game.load.audio("bgm","demo/assets/CatAstroPhi_shmup_normal.wav")
+  game.load.audio("ding","demo/assets/p-ping.mp3")
+}
+
+var bird;
+var pipes;
+var timer;
+var score=0; 
+var scoreBoard;
+var bgm;
+var ding;
+function create(){
+  if(!bgm){
+    bgm=game.add.audio("bgm",0.1,true)
+    bgm.play()
+  }
+  ding=game.add.audio("ding",0.5)
+  game.physics.startSystem(Phaser.Physics.ARCADE)
+  game.stage.backgroundColor="rgba(224,151,151)"
+  game.add.sprite(0,0,"universe")
+  bird=game.add.sprite(50,300,"bird")
+  game.physics.arcade.enable(bird)
+  bird.body.gravity.y=400
+  keySpace=game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR) 
+  keySpace.onDown.add(jump,this) 
+  pipes=game.add.group()
+  pipes.enableBody=true
+  score=0
+  scoreBoard=game.add.text(20,20,"Score: 0",{fill: "white",font:"30px Copperplate"})
+  timer=setInterval(timeToCreateANewWall,1500)
+}
+
+function jump(){
+  bird.body.velocity.y=-300
+  //bird.angle=-20
+  game.add.tween(bird).to({angle:-20},200).start()
+}
+
+function timeToCreateANewWall(){
+    createPipeWall(799)
+    score+=10
+    scoreBoard.text="Score:" +score
+    ding.play()
+}
+
+
+function update(){
+  if(bird.angle<40){
+    bird.angle+=1
+  }
+  game.physics.arcade.collide(bird,pipes,gameover,null,this)
+  bird.scale.setTo(0.01,0.01)
+}
+
+function gameover(bird,block){
+  game.add.text(300,300,"GAME_OVER",{fill:"#fbe5f2",font:"40px Arial Bold"})
+  var replay=game.add.text(300,350,":(      REPLAY",{fill:"#fbe5f2",font:"40px Comic Sans MS"})
+  replay.inputEnabled=true
+  replay.events.onInputDown.add(restart)
+  clearInterval(timer)
+}
+
+function restart(){
+  game.state.start("default")
+}
+
+function createPipeWall(x){
+  var gapidx=Math.random()*12
+  gapidx=Math.floor(gapidx)
+  for(i=0;i<13;i++){
+    if(i==gapidx||i==(gapidx+1)){
+      continue
+    }
+    var y=48*i
+    var block=pipes.create(x,y,"blk")
+    block.scale.setTo(0.5,0.5)
+    block.body.velocity.x=-200
+    block.body.immovable=true
+    block.checkWorldBounds=true
+    block.outOfBoundsKill=true
+  }
+}
+</script>
+</body>
+</html>

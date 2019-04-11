@@ -1,0 +1,42 @@
+<html>
+    <head>
+    </head>
+    <body>
+        <script src="phaser.min.js"> 
+        </script>
+        <script>
+            var game=new Phaser.Game()
+            var level0={
+                preload:function(){
+                    this.game.load.image("player","demo/assets/animeG.png")
+                    this.game.load.tilemap("map","demo/assets/level0.json",null,Phaser.Tilemap.TILED_JSON)
+                    this.game.load.image("ground","demo/assets/background0.jpg")
+                },
+                create:function(){
+                   this.map=this.game.add.tilemap("map")
+                   this.map.addTilesetImage("background0","ground")
+                   this.layer=this.map.createLayer(1)
+                   this.layer.resizeWorld()
+                   this.player=this.game.add.sprite(100,100,"player")
+                   this.player.scale.setTo(0.5)
+                   this.player.y=this.game.world.height-100
+                   this.player.anchor.set(0.5)
+                   this.game.camera.follow(this.player)
+                   this.cursors=this.game.input.keyboard.createCursorKeys()
+                },
+                update:function(){
+                   if(this.cursors.up.isDown){
+                       this.player.y-=2
+                   }
+                   if(this.cursors.down.isDown){
+                       this.player.y+=2
+                   }
+                },
+                name:"demo game"
+            }
+            console.log(level0.name)   
+                     game.state.add("lev1",level0)
+            game.state.start("lev1")
+        </script>
+    </body>
+</html>

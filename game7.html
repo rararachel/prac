@@ -1,0 +1,66 @@
+<html>
+<head>
+</head>
+<body>
+<script src="phaser.min.js"></script>
+<script>
+var level={preload:preload,create:create,update:update}
+var game=new Phaser.Game(800,600,Phaser.AUTO,"",level)
+
+function preload(){
+  game.load.image("bird","demo/assets/melon.png")
+  game.load.image("blk","demo/assets/xiangzi.png")
+}
+
+var bird;
+var pipes;
+function create(){
+  game.physics.startSystem(Phaser.Physics.ARCADE)
+  game.stage.backgroundColor="rgba(130,199,133)"
+  bird=game.add.sprite(50,300,"bird")
+  game.physics.arcade.enable(bird)
+  bird.body.gravity.y=400
+  keySpace=game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR) 
+  keySpace.onDown.add(jump,this) 
+  pipes=game.add.group()
+  pipes.enableBody=true
+  setInterval(timeToCreateANewWall,1000)
+ 
+}
+
+function jump(){
+  bird.body.velocity.y=-300
+}
+
+function timeToCreateANewWall(){
+  createPipeWall(700)
+
+}
+
+
+function update(){
+ game.physics.arcade.collide(bird,pipes,gameover,null,this)
+}
+
+function gameover(bird,block){
+  game.add.text(300,300,"GAME_OVER",{fill:"#e4e14e",font:"40px Arial Bold"})
+  game.add.text(300,350,":(",{fill:"#e4e14e",font:"40px Arial Bold"})
+}
+
+function createPipeWall(x){
+  var gapidx=Math.random()*12
+  gapidx=Math.floor(gapidx)
+  for(i=0;i<13;i++){
+    if(i==gapidx||i==(gapidx+1)){
+      continue
+    }
+    var y=48*i
+    var block=pipes.create(x,y,"blk")
+    block.scale.setTo(0.5,0.5)
+    block.body.velocity.x=-200
+    block.body.immovable=true
+  }
+}
+</script>
+</body>
+</html>

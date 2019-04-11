@@ -1,0 +1,24 @@
+<html>
+    <head>
+    </head>
+    <body>
+        <script src="phaser.min.js">
+        </script>
+        <script>
+            var game=new Phaser.Game()
+            var level0={
+              preload:function(){
+                 this.game.load.spritesheet("cwqs","demo/assets/cwq1234.png",100,100) 
+              },
+              create:function(){
+                  this.game.stage.backgroundColor="#ffffff"
+                  this.player=this.game.add.sprite(10,10,"cwqs")
+                  this.player.animations.add("walk",[1,2,3,4,5,6,7,8,9],5,true)
+                  this.player.animations.play("walk")
+              }
+            }
+            game.state.add("L0",level0)
+            game.state.start("L0")
+        </script>
+    </body>
+</html>

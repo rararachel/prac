@@ -1,0 +1,85 @@
+<html>
+<head>
+</head>
+<body>
+<script src="phaser.min.js"></script>
+<script>
+var level={preload:preload,create:create,update:update}
+var game=new Phaser.Game(800,600,Phaser.AUTO,"",level)
+
+function preload(){
+  game.load.image("paddle","demo/assets/paddle.png")
+  game.load.image("ball","demo/assets/ball.png")
+  game.load.image("brick0","demo/assets/brick0.png")
+}
+
+var paddle;
+var ball;
+var bricks;
+var cursor;
+var started=false;
+function create(){
+  game.physics.startSystem(Phaser.Physics.ARCADE)
+  game.physics.arcade.checkCollision.down=false
+  paddle=game.add.sprite(200,550,"paddle")
+  game.physics.arcade.enable(paddle)
+  paddle.body.immovable=true
+  paddle.anchor.setTo(0.5,0.5)
+  paddle.body.collideWorldBounds=true
+  paddle.body.bounce.set(1)
+  ball=game.add.sprite(200,530,"ball")
+  game.physics.arcade.enable(ball)
+  ball.anchor.setTo(0.5,0.5)
+  ball.body.collideWorldBounds=true
+  ball.body.bounce.set(1)
+  bricks=game.add.group()
+  bricks.enableBody=true
+  for(j=0;j<4;j++){
+    for(i=0;i<15;i++){
+      var x=(i+1)*45
+      var y=50+30*j
+      var bri=bricks.create(x,y,"brick0")
+      bri.body.immovable=true
+      bri.body.bounce.set(1)
+    }
+  }
+ cursor=game.input.keyboard.createCursorKeys() 
+ game.input.onDown.add(startGame,this)
+ ball.checkWorldBounds=true
+ ball.events.onOutOfBounds.add(gameOver,this)
+}
+
+
+
+function startGame(){
+  ball.body.velocity.x=123
+  ball.body.velocity.y=-400
+  started=true
+}
+
+function gameOver(){
+  game.add.text(300,300,"_GAME-OVER_",{fill:"white",font:"40px Arial"})
+  console.log("gameover")
+}
+
+
+function update(){
+  game.physics.arcade.collide(ball,bricks,clearBrick,null,this)
+  game.physics.arcade.collide(ball,paddle)
+  if(started==false){
+    ball.x=paddle.x
+  }
+  if(cursor.left.isDown){
+    paddle.body.x -=10
+  }
+  if(cursor.right.isDown){
+    paddle.body.x +=10
+  }
+}
+
+function clearBrick(ball,brick){
+  brick.kill()
+}
+</script>
+</body>
+</html>

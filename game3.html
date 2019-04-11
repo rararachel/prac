@@ -1,0 +1,91 @@
+<html>
+<head>
+</head>
+<body>
+<h1>revision</h1>
+<script src="phaser.min.js"></script>
+<script>
+var level={preload:preload,create:create,update:update}
+var game=new Phaser.Game(800,600,Phaser.AUTO,"",level);
+function preload(){
+  game.load.image("sky","demo/assets/sky.png");
+  game.load.image("star","demo/assets/star.png");
+  game.load.image("platform","demo/assets/platform.png");
+  game.load.spritesheet("dude","demo/assets/dude.png",32,48);
+}
+var dude;
+var cursors;
+var stars;
+var score;
+var fen=0;
+function create(){
+  game.physics.startSystem(Phaser.Physics.ARCADE);
+  game.add.sprite(0,0,"sky"); 
+
+  //create dude
+  dude=game.add.sprite(200,200,"dude");
+  dude.animations.add("left",[0,1,2,3],10,true);
+  dude.animations.add("right",[5,6,7,8],10,true);
+  game.physics.arcade.enable(dude);
+  dude.body.gravity.y=300;
+  dude.body.collideWorldBounds=true;
+
+  //create star group
+  stars=game.add.group();
+  stars.enableBody=true;//enable group physics
+  for(i=0;i<20;i++){
+    var star=stars.create(Math.random()*800,0,"star");
+    star.body.gravity.y=Math.random()*100+50;
+  }
+
+  //create platform group
+  platforms=game.add.group();
+  platforms.enableBody=true;
+  p1=platforms.create(-100,250,"platform");
+  p1.body.immovable=true;
+  p2=platforms.create(450,450,"platform");
+  p2.body.immovable=true;
+  p3=platforms.create(0,570,"platform");
+  p3.body.immovable=true;
+  p3.scale.setTo(2,1);
+
+  
+  //score text
+  score=game.add.text(16,16,"score");
+
+  //create cursorkey
+  cursor=game.input.keyboard.createCursorKeys();
+}
+
+function update(){
+  var hit=game.physics.arcade.collide(dude,platforms);
+  game.physics.arcade.collide(stars,platforms);
+  if(cursor.left.isDown){
+    dude.animations.play("left");
+    dude.body.velocity.x=-100;
+  }else if(cursor.right.isDown){
+    dude.animations.play("right");
+    dude.body.velocity.x=100;
+  }else{
+    dude.frame=4;
+    dude.body.velocity.x=0;
+  }
+  if(cursor.up.isDown && hit){
+    dude.body.velocity.y=-400;
+  }
+  game.physics.arcade.overlap(dude,stars,collect,null,this);
+}
+
+function collect(dude,star){
+  star.kill();
+  fen=fen+10;
+  score.text="score "+fen;
+}
+
+
+
+</script>
+
+</body>
+</html>
+

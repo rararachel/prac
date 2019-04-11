@@ -1,0 +1,177 @@
+<html>
+<head>
+</head>
+<body>
+<script src="phaser.min.js"> </script>
+<script>
+var level={init:init,preload:preload,create:create,update:update,render:render}
+var game= new Phaser.Game(448,496,Phaser.AUTO,"",level)
+
+function preload(){
+  game.load.image("tiles","demo/assets/pacman-tiles.png")
+  game.load.tilemap("map", "demo/assets/pacman-map.json",null,Phaser.Tilemap.TILED_JSON)
+  game.load.image("pill","demo/assets/pill16.png")
+  game.load.image("bean","demo/assets/dot.png")
+  game.load.spritesheet("pacman","demo/assets/pacman.png",32,32)
+}
+
+
+var map;
+var layer;
+var pills;
+var beans;
+var pacman;
+function create(){
+  game.physics.startSystem(Phaser.Physics.ARCADE)
+  map=game.add.tilemap("map")
+  map.addTilesetImage("pacman-tiles","tiles")
+  layer=map.createLayer("Pacman")
+  
+  pills=game.add.group()
+  pills.enableBody=true
+  map.createFromTiles(40,14,"pill",layer,pills)
+  beans=game.add.group()
+  beans.enableBody=true
+  map.createFromTiles(7,14,"bean",layer,beans)
+  map.setCollisionByExclusion([14],true,layer)
+  var x=6*16+8
+  var y=5*16+8
+  pacman=game.add.sprite(x,y,"pacman")
+  pacman.anchor.set(0.5)
+  pacman.animations.add("eat",[0,1,2,0],20,true)
+  pacman.animations.play("eat")
+  game.physics.arcade.enable(pacman)
+  pacman.body.collideWorldBounds=true
+  pacman.body.setSize(16,16,8,8)
+  cursors=game.input.keyboard.createCursorKeys()
+  //drawGrid()
+  
+}
+
+
+var available={}
+var wayToGo
+var direction="right"
+function update(){
+  console.log(pacman.x,pacman.y)
+  game.physics.arcade.overlap(pacman,beans,eatBean,null,this)
+  game.physics.arcade.overlap(pacman,pills,drinkPill,null,this)
+  game.physics.arcade.collide(pacman,layer)
+  
+  var tx=layer.getTileX(pacman.x)
+  var ty=layer.getTileY(pacman.y)
+  //console.log(tx,ty)
+  var tileUp=map.getTileAbove(layer.index,tx,ty)
+  var tileDown=map.getTileBelow(layer.index,tx,ty)  
+  var tileLeft=map.getTileLeft(layer.index,tx,ty)
+  var tileRight=map.getTileRight(layer.index,tx,ty)
+  available={}
+  if(tileUp && tileUp.index==14){
+    available.up=true
+  }
+  if(tileDown && tileDown.index==14){
+    available.down=true
+  }
+  if(tileLeft && tileLeft.index==14){
+    available.left=true
+  }
+  if(tileRight && tileRight.index==14){
+    available.right=true
+  }
+  //console.log(available)
+
+
+  
+  
+  if(direction=="left"){
+    pacman.body.velocity.x=-200
+    pacman.body.velocity.y=0
+    pacman.angle=180
+  }
+  if(direction=="right"){
+    pacman.body.velocity.x=200
+    pacman.body.velocity.y=0
+    pacman.angle=0
+  }
+  if(direction=="up"){
+    pacman.body.velocity.x=0
+    pacman.body.velocity.y=-200
+    pacman.angle=270
+  }
+  if(direction=="down"){
+    pacman.body.velocity.x=0
+    pacman.body.velocity.y=200
+    pacman.angle=90
+  }
+  if(cursors.left.isDown){
+    wayToGo="left"
+  }
+  if(cursors.right.isDown){
+    wayToGo="right"
+  }
+  if(cursors.up.isDown){
+    wayToGo="up"
+  }
+  if(cursors.down.isDown){
+    wayToGo="down"
+  }  
+  if(wayToGo && direction!=wayToGo){
+    if(available[wayToGo]){ 
+      console.log(wayToGo,direction)
+      var newX=tx*16+8
+      var newY=ty*16+8
+      pacman.x=newX
+      pacman.y=newY
+      pacman.body.reset(newX,newY)
+      direction=wayToGo
+    }
+   
+  }
+  
+}
+
+function eatBean(pacman,bean){
+  bean.kill()
+}
+
+function drinkPill(pacman,pill){
+  pill.kill()
+}
+
+function render(){
+  game.debug.body(pacman)
+}
+
+function drawGrid(){
+  var graph=game.add.graphics()
+  graph.lineStyle(1,0x006600,1)
+  //graph.moveTo(20,20)
+  //graph.lineTo(500,500)
+  for(i=0;i<30;i++){
+    graph.moveTo(0,i*16)
+    graph.lineTo(27*16,i*16)
+  }
+  for(i=0;i<27;i++){
+    graph.moveTo(i*16,0)
+    graph.lineTo(i*16,30*16)
+  }
+}
+
+function init(){
+ //game.scale.scaleMode=Phaser.ScaleManager.SHOW_ALL
+ //game.scale.pageAlignHorizontally=true
+
+}
+
+function test(){
+  setInterval(function(){
+    pacman.x+=16
+  },500)
+  
+
+}
+
+</script>
+
+</body>
+</html>
